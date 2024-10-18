@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Painel do Usuário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        img {
+            border-radius: 50%;
+            margin-bottom: 10px;
+            cursor: pointer; /* Indica que a imagem é clicável */
+        }
+        /* Estilos do modal */
+        .modal {
+            display: none; /* Oculta o modal por padrão */
+            position: fixed; /* Fica fixo na tela */
+            z-index: 1; /* Coloca o modal acima de outros elementos */
+            left: 0;
+            top: 0;
+            width: 100%; /* Largura total */
+            height: 100%; /* Altura total */
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro e semi-transparente */
+            justify-content: center; /* Centraliza o conteúdo do modal */
+            align-items: center; /* Centraliza verticalmente */
+        }
+        .modal-content {
+            max-width: 90%; /* Limita a largura máxima da imagem */
+            max-height: 90%; /* Limita a altura máxima da imagem */
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .navbar {
+    background-color: #333;
+    overflow: hidden;
+    
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+.navbar a {
+    float: left;
+    display: block;
+    color: #fff;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+.navbar a:hover {
+    background-color: #575757;
+}
+.content {
+    margin-top: 60px; /* Espaço para o menu fixo */
+    padding: 20px;
+}
+.page {
+    display: none; /* Esconder todas as páginas por padrão */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo do título */
+h1, h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos inputs e botões */
+input[type="text"],
+input[type="number"],
+input[type="file"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Estilo das mensagens */
+#profileMessage, #productMessage {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#profileMessage {
+    color: green;
+}
+
+/* Estilo dos cartões de produtos */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Ajuste o número mínimo e máximo para o tamanho desejado */
+    gap: 20px; /* Espaçamento entre os cartões */
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo do cartão */
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.product-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Modificação do modal */
+#profileModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+#modalImage {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+}
+
+/* Botão para fechar o modal */
+#closeModal {
+    cursor: pointer;
+    padding: 10px 20px;
+    color: white;
+    background-color: red;
+    border: none;
+    border-radius: 5px;
+}
+    </style>
+    
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#" onclick="showPage('home')">Início</a>
+        <a href="#" onclick="showPage('sobre')">Sobre</a>
+        <a href="#" onclick="showPage('como-funciona')">Como Funciona</a>
+        <a href="#" onclick="showPage('cadastrar')">Criar Conta</a>
+        <a ><button id="logout">Logout</button></a>
+        
+    </div>
+    
+
+    <div>
+        <h2>Editar Perfil</h2>
+        <img id="profileImage" src="" alt="Foto de Perfil" style="width: 150px; height: 150px; display: none;" />
+        <h3 id="profileNameDisplay"></h3> <!-- Para mostrar o nome atualizado como link -->
+        <button id="editProfile">Editar Perfil</button>
+        <button id="saveChanges" style="display: none;">Salvar Alterações</button>
+        <p id="profileMessage" style="color: green;"></p> <!-- Mensagem de sucesso -->
+    
+    <div id="profileDetails">
+        <input type="text" id="userName" placeholder="Nome" required disabled />
+        <input type="file" id="profilePhoto" accept="image/*" />
+        <textarea id="biography" placeholder="Digite sua biografia aqui..." rows="4" style="width: 100%;" disabled></textarea>
+    </div>
+
+    
+    
+    
+</div>
+<div class="navbar">
+    <a href="#" onclick="showPage('home')">produtos</a>
+    <a href="#" onclick="showPage('sobre')">clientes</a>
+    <a href="#" onclick="showPage('como-funciona')">painel visitantes</a>
+    <a href="#" onclick="showPage('cadastrar')"></a>
+    <a href="#" onclick="showPage('login')"></a>
+    <a href="#" onclick="showPage('contato')"></a>
+</div>
+<div class="content">
+    <div id="home" class="page" style="display: block;"> <!-- Exibir a página inicial por padrão -->
+        <h2 id="profileBiographyDisplay" style="font-size: 1.5em; text-align: center;"></h2> <!-- Para exibir a biografia atual -->
+        <div>
+            <h2>Gerenciador de Produtos</h2>
+            <input type="text" id="productName" placeholder="Nome do Produto">
+            <input type="number" id="productPrice" placeholder="Preço">
+            <textarea id="productDescription" placeholder="Descrição"></textarea>
+            <input type="file" id="productImageFile">
+            <button id="addProductButton">Adicionar Produto</button>
+            <div id="productMessage"></div>
+            
+            <h2>Produtos</h2>
+            <input type="text" id="searchInput" placeholder="Pesquisar produtos..." />
+            <div id="productsContainer" class="products-container"></div>
+        </div>
+    </div>
+    <div id="sobre" class="page">
+        <h2>Sobre Nós</h2>
+        <p>Descubra o que fazemos e como podemos ajudar empreendedores a crescer.</p>
+    </div>
+    <div id="como-funciona" class="page">
+        <h2>Como Funciona</h2>
+        <p>Saiba mais sobre como criar sua loja e interagir com clientes.</p>
+    </div>
+    <script src="./index.js"></script>
+<script>
+ // Seleciona os elementos necessários
+    const editProfileButton = document.getElementById('editProfile');
+    const saveChangesButton = document.getElementById('saveChanges');
+    const profileMessage = document.getElementById('profileMessage');
+    const profileNameDisplay = document.getElementById('profileNameDisplay');
+    const updatedProfileImage = document.getElementById('updatedProfileImage');
+    const profilePhotoInput = document.getElementById('profilePhoto');
+
+    // Função para carregar os dados do perfil do localStorage
+    function loadProfile() {
+        const userName = localStorage.getItem('userName');
+        const biography = localStorage.getItem('biography');
+        const profileImageUrl = localStorage.getItem('profileImageUrl');
+
+        if (userName) {
+            // Criar um link para o nome do usuário
+            profileNameDisplay.innerHTML = `<a href="userProfile.html" id="userNameLink">${userName}</a>`;
+        }
+
+        if (biography) {
+            // Mostrar a biografia se necessário, adicionar um campo para isso
+        }
+
+        if (profileImageUrl) {
+            updatedProfileImage.src = profileImageUrl;
+            updatedProfileImage.style.display = 'block'; // Exibir a imagem
+        }
+    }
+
+    // Função para habilitar os campos de entrada para edição
+    function enableEditing() {
+        document.getElementById('userName').style.display = 'block'; // Exibir input de nome
+        document.getElementById('biography').style.display = 'block'; // Exibir input de biografia
+        profilePhotoInput.style.display = 'block'; // Exibir o input de foto
+        saveChangesButton.style.display = 'inline'; // Mostrar botão de salvar
+        editProfileButton.style.display = 'none'; // Ocultar botão de editar
+    }
+
+    // Função para salvar as alterações no localStorage
+    function saveProfile() {
+        const userName = document.getElementById('userName').value;
+        const biography = document.getElementById('biography').value;
+        
+        // Atualiza a exibição com os novos dados
+        profileNameDisplay.innerHTML = `<a href="userProfile.html" id="userNameLink">${userName}</a>`;
+        
+        // Salvar no localStorage
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('biography', biography);
+
+        // Atualizar a foto do perfil, se necessário
+        if (profilePhotoInput.files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                updatedProfileImage.src = e.target.result;
+                localStorage.setItem('profileImageUrl', e.target.result);
+                updatedProfileImage.style.display = 'block'; // Certifique-se de mostrar a imagem
+            };
+            reader.readAsDataURL(profilePhotoInput.files[0]);
+        }
+
+        // Limpar o input de foto
+        profilePhotoInput.value = '';
+        profilePhotoInput.style.display = 'none'; // Ocultar o input de foto
+
+        // Mensagem de confirmação
+        profileMessage.textContent = 'Alterações salvas com sucesso!';
+        
+        // Desabilitar os campos de entrada
+        document.getElementById('userName').style.display = 'none';
+        document.getElementById('biography').style.display = 'none';
+        saveChangesButton.style.display = 'none'; // Ocultar botão de salvar
+        editProfileButton.style.display = 'inline'; // Mostrar botão de editar
+    }
+
+    // Eventos
+    editProfileButton.addEventListener('click', enableEditing);
+    saveChangesButton.addEventListener('click', saveProfile);
+
+    // Carregar os dados do perfil ao iniciar
+    loadProfile();
+
+// Inicia desabilitando o botão de salvar
+saveChangesButton.style.display = 'none';
+
+// Habilita a edição dos campos
+editProfileButton.addEventListener('click', () => {
+    // Habilita os campos de perfil
+    inputs.forEach(input => input.disabled = false);
+    
+    // Mostra o botão de salvar alterações
+    saveChangesButton.style.display = 'inline-block';
+});
+
+// Função para salvar as alterações
+saveChangesButton.addEventListener('click', () => {
+    // Habilita os campos de entrada para o usuário
+    inputs.forEach(input => input.disabled = true);
+    
+    // Esconde o botão de salvar alterações
+    saveChangesButton.style.display = 'none';
+    
+    // Atualiza a exibição do nome
+    const userName = document.getElementById('userName').value;
+    profileNameDisplay.textContent = userName;
+    localStorage.setItem('userName', userName); // Armazena no localStorage
+    
+    // Atualiza a exibição da biografia
+    const biography = document.getElementById('biography').value;
+    profileBiographyDisplay.textContent = biography;
+    localStorage.setItem('biography', biography); // Armazena no localStorage
+    
+    // Atualiza a imagem de perfil se uma imagem for selecionada
+    const file = profilePhotoInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            updatedProfileImage.src = e.target.result;
+            updatedProfileImage.style.display = 'block';
+            localStorage.setItem('profileImageUrl', e.target.result); // Armazena no localStorage
+        }
+        reader.readAsDataURL(file);
+    }
+
+    // Mensagem de sucesso
+    profileMessage.textContent = 'Alterações salvas com sucesso!';
+});
+</script>
+    
+
+    <!-- Modal para visualização da imagem em tamanho grande -->
+     
+    <div id="profileModal" class="modal">
+        <span class="close" id="closeModal">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Foto de Perfil Grande">
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-lYo7qq6i0NkoQYgeVbwKyqPgWfJZo5w",
+            authDomain: "redesocial-ba56d.firebaseapp.com",
+            projectId: "redesocial-ba56d",
+            storageBucket: "redesocial-ba56d.appspot.com",
+            messagingSenderId: "576775892671",
+            appId: "1:576775892671:web:4d0c2ceb8f8fca6ddf600a",
+            measurementId: "G-4558TRLJB8"
+        };
+
+        // Inicializando o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+        const storage = getStorage();
+
+        // Função para carregar os dados do usuário
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    document.getElementById('userName').value = userDoc.data().name || '';
+                    const profileImage = document.getElementById('profileImage');
+                    if (userDoc.data().photoURL) {
+                        profileImage.src = userDoc.data().photoURL;
+                        profileImage.style.display = 'block'; // Mostra a imagem se existir
+                    }
+                    document.getElementById('profileNameDisplay').textContent = `Nome Atual: ${userDoc.data().name}`;
+                    listProducts(user.uid); // Lista produtos ao carregar o perfil
+                }
+            } else {
+                window.location.href = "/login.html";
+            }
+        });
+
+        // Função para salvar as alterações no perfil
+        document.getElementById('saveChanges').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            const name = document.getElementById('userName').value;
+            const photoFile = document.getElementById('profilePhoto').files[0];
+            const profileMessage = document.getElementById('profileMessage');
+
+            profileMessage.textContent = ''; // Limpar mensagem anterior
+
+            try {
+                if (photoFile) {
+                    const storageRef = ref(storage, `profile_photos/${user.uid}`);
+                    await uploadBytes(storageRef, photoFile);
+                    const photoURL = await getDownloadURL(storageRef);
+
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: name,
+                        photoURL: photoURL
+                    }, { merge: true });
+
+                    profileMessage.textContent = 'Perfil atualizado com sucesso!';
+                    profileImage.src = photoURL; // Atualiza a imagem de perfil exibida
+                } else {
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: name
+                    }, { merge: true });
+                    profileMessage.textContent = 'Nome atualizado com sucesso!';
+                }
+
+                document.getElementById('profileNameDisplay').textContent = `Nome Atual: ${name}`;
+
+            } catch (error) {
+                console.error('Erro ao atualizar o perfil:', error);
+                profileMessage.textContent = 'Erro ao atualizar o perfil.';
+            }
+        });
+
+        // Funcão para adicionar produtos
+        document.getElementById('addProductButton').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            const productName = document.getElementById('productName').value;
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const productDescription = document.getElementById('productDescription').value;
+            const productImageFile = document.getElementById('productImageFile').files[0];
+            const productMessage = document.getElementById('productMessage');
+            productMessage.textContent = ''; // Limpar mensagem anterior
+
+            try {
+                if (productImageFile) {
+                    const storageRef = ref(storage, `products/${productImageFile.name}`);
+                    await uploadBytes(storageRef, productImageFile);
+                    const imageUrl = await getDownloadURL(storageRef);
+
+                    await addDoc(collection(db, 'users', user.uid, 'products'), {
+                        name: productName,
+                        price: productPrice,
+                        description: productDescription,
+                        imageUrl: imageUrl
+                    });
+
+                    productMessage.textContent = 'Produto adicionado com sucesso!';
+                    listProducts(user.uid); // Atualiza a lista de produtos
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar produto:', error);
+                productMessage.textContent = 'Erro ao adicionar produto.';
+            }
+        });
+
+        // Função para listar produtos
+        function listProducts(userId) {
+    const productsRef = collection(db, 'users', userId, 'products');
+    const searchInput = document.getElementById('searchInput');
+
+    onSnapshot(productsRef, (snapshot) => {
+        const productContainer = document.getElementById('productsContainer');
+        productContainer.innerHTML = ''; // Limpar o contêiner de produtos
+
+        // Criar um array para armazenar produtos filtrados
+        let products = [];
+
+        snapshot.forEach(doc => {
+            const product = { id: doc.id, ...doc.data() };
+            products.push(product); // Adicionar produto ao array
+        });
+
+        // Função para exibir produtos
+        function displayProducts(filteredProducts) {
+            productContainer.innerHTML = ''; // Limpar o contêiner de produtos
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <img src="${product.imageUrl}" alt="${product.name}">
+                    <p>Preço: R$ ${product.price.toFixed(2)}</p>
+                    <p>${product.description}</p>
+                    <button onclick="editProduct('${userId}', '${product.id}')">Editar</button>
+                    <button onclick="deleteProduct('${userId}', '${product.id}')">Eliminar</button>
+                `;
+                productContainer.appendChild(productCard);
+            });
+        }
+
+        // Exibir todos os produtos inicialmente
+        displayProducts(products);
+
+        // Evento para capturar a entrada de pesquisa e filtrar produtos
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.type.toLowerCase().includes(searchTerm) // Filtrar pelo tipo de produto, se existir.
+            );
+            displayProducts(filteredProducts); // Exibir produtos filtrados
+        });
+    });
+}
+
+        // Função para editar produto
+        async function editProduct(userId, productId) {
+            const productRef = doc(db, 'users', userId, 'products', productId);
+            const productDoc = await getDoc(productRef);
+            if (productDoc.exists()) {
+                const product = productDoc.data();
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productDescription').value = product.description;
+
+                // Atualiza a função do botão para editar
+                document.getElementById('addProductButton').onclick = async function () {
+                    const updatedData = {
+                        name: document.getElementById('productName').value,
+                        price: parseFloat(document.getElementById('productPrice').value),
+                        description: document.getElementById('productDescription').value
+                    };
+                    await setDoc(productRef, updatedData, { merge: true });
+                    listProducts(userId); // Atualiza a lista de produtos
+                };
+            }
+        }
+
+        // Função para excluir produto
+        async function deleteProduct(userId, productId) {
+            const productRef = doc(db, 'users', userId, 'products', productId);
+            try {
+                await deleteDoc(productRef);
+                console.log('Produto excluído com sucesso!');
+            } catch (error) {
+                console.error('Erro ao excluir produto', error);
+            }
+        }
+
+        // Logout
+        document.getElementById('logout').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "/Users/M%C3%A1rio/Documents/tcc%20M%C3%A1rio/sistema%20de%20rede%20social%20para%20empreendedores/login.html"; // Redireciona para a página de login
+            } catch (error) {
+                console.error('Erro ao sair:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Social para Empreendedores</title>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <h1>Cadastro de Usuário</h1>
+    <input type="email" id="registerEmail" placeholder="Email" required>
+    <input type="password" id="registerPassword" placeholder="Senha" required>
+    <button id="register">Cadastrar</button>
+    <p id="registerMessage" style="color: green;"></p> <!-- Parágrafo para mensagem de sucesso -->
+
+    <h1>Login</h1>
+    <input type="email" id="loginEmail" placeholder="Email" required>
+    <input type="password" id="loginPassword" placeholder="Senha" required>
+    <button id="login">Login</button>
+    <p id="loginMessage" style="color: red;"></p> <!-- Parágrafo para mensagem de erro -->
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-lYo7qq6i0NkoQYgeVbwKyqPgWfJZo5w",
+            authDomain: "redesocial-ba56d.firebaseapp.com",
+            projectId: "redesocial-ba56d",
+            storageBucket: "redesocial-ba56d.appspot.com",
+            messagingSenderId: "576775892671",
+            appId: "1:576775892671:web:4d0c2ceb8f8fca6ddf600a",
+            measurementId: "G-4558TRLJB8"
+        };
+
+        // Inicializando o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+
+        // Verifica se o usuário está autenticado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Se o usuário estiver logado, redireciona para a página de perfil
+                window.location.href = "./perfil.html";
+            }
+        });
+
+        // Função para registrar um novo usuário
+        document.getElementById('register').addEventListener('click', async () => {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const registerMessage = document.getElementById('registerMessage'); // Mensagem de sucesso
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                // O usuário é criado com sucesso, então você pode adicionar mais dados ao Firestore
+                const user = userCredential.user;
+                
+                // Exemplo: Criar um documento no Firestore para o novo usuário
+                await setDoc(doc(db, "users", user.uid), {
+                    email: user.email,
+                    createdAt: new Date()
+                });
+
+                // Mensagem de sucesso
+                registerMessage.textContent = 'Usuário cadastrado com sucesso!';
+                
+                // Redirecionar para o perfil (ou onde preferir)
+                setTimeout(() => {
+                    window.location.href = "./perfil.html"; 
+                }, 2000); // Redireciona após 2 segundos
+
+            } catch (error) {
+                console.error('Erro ao cadastrar:', error);
+                registerMessage.style.color = 'red';  // Altera a cor para vermelho em caso de erro
+                registerMessage.textContent = 'Erro ao cadastrar. Verifique se o email já está em uso ou se a senha é válida.';
+            }
+        });
+
+        // Função para fazer login
+        document.getElementById('login').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginMessage = document.getElementById('loginMessage'); // Mensagem de erro
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                // Login bem-sucedido, redirecionar para o perfil
+                window.location.href = "./perfil.html";
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                loginMessage.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
+            }
+        });
+    </script>
+</body>
+</html>
