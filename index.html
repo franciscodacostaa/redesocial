@@ -3,101 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./index.css">
     <title>Rede Social para Empreendedores</title>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+    
 </head>
 <body>
-    <h1>Cadastro de Usuário</h1>
-    <input type="email" id="registerEmail" placeholder="Email" required>
-    <input type="password" id="registerPassword" placeholder="Senha" required>
-    <button id="register">Cadastrar</button>
-    <p id="registerMessage" style="color: green;"></p> <!-- Parágrafo para mensagem de sucesso -->
 
-    <h1>Login</h1>
-    <input type="email" id="loginEmail" placeholder="Email" required>
-    <input type="password" id="loginPassword" placeholder="Senha" required>
-    <button id="login">Login</button>
-    <p id="loginMessage" style="color: red;"></p> <!-- Parágrafo para mensagem de erro -->
+    <div class="navbar">
+        <a href="#" onclick="showPage('home')">Início</a>
+        <a href="#" onclick="showPage('sobre')">Sobre</a>
+        <a href="#" onclick="showPage('como-funciona')">Como Funciona</a>
+        <a href="#" onclick="showPage('cadastrar')"></a>
+        <a href="#" onclick="showPage('login')">Cadastrar ou Entrar</a>
+        <a href="#" onclick="showPage('contato')"></a>
+    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    <div class="content">
+        <div id="home" class="page" style="display: block;"> <!-- Exibir a página inicial por padrão -->
+            <h1>Bem-vindo à Nossa Rede Social para Empreendedores!</h1>
+            <p>Aqui, você pode criar sua loja online e personalizá-la como quiser. Cadastre-se para começar a postar seus produtos e descobri-los de forma fácil.</p>
+        </div>
 
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-lYo7qq6i0NkoQYgeVbwKyqPgWfJZo5w",
-            authDomain: "redesocial-ba56d.firebaseapp.com",
-            projectId: "redesocial-ba56d",
-            storageBucket: "redesocial-ba56d.appspot.com",
-            messagingSenderId: "576775892671",
-            appId: "1:576775892671:web:4d0c2ceb8f8fca6ddf600a",
-            measurementId: "G-4558TRLJB8"
-        };
+        <div id="sobre" class="page">
+            <h2>Sobre Nós</h2>
+            <p>Descubra o que fazemos e como podemos ajudar empreendedores a crescer.</p>
+        </div>
 
-        // Inicializando o Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth();
-        const db = getFirestore();
+        <div id="como-funciona" class="page">
+            <h2>Como Funciona</h2>
+            <p>Saiba mais sobre como criar sua loja e interagir com clientes.</p>
+        </div>
 
-        // Verifica se o usuário está autenticado
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Se o usuário estiver logado, redireciona para a página de perfil
-                window.location.href = "./perfil.html";
-            }
-        });
+        <div id="cadastrar" class="page">
+            <h2>Criar Conta</h2>
+            <p>Preencha as informações para criar uma nova conta!</p>
+            <form>
+                <input type="text" placeholder="Nome" required><br><br>
+                <input type="email" placeholder="E-mail" required><br><br>
+                <input type="password" placeholder="Senha" required><br><br>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </div>
 
-        // Função para registrar um novo usuário
-        document.getElementById('register').addEventListener('click', async () => {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const registerMessage = document.getElementById('registerMessage'); // Mensagem de sucesso
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        <div id="login" class="page">
+            <h1>Sua jornada de compras e vendas começa aqui!</h1>
+            <div class="container" id="container">
+                <div class="form-container sign-up-container">
+                    <div class="social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="form-container sign-in-container">
+                    <div class="overlay">
                 
-                // O usuário é criado com sucesso, então você pode adicionar mais dados ao Firestore
-                const user = userCredential.user;
+                        <div class="overlay-panel overlay-right">
+            <h1>Cadastre-se</h1>
+            
+            <input type="email" id="registerEmail" placeholder="Email" required >
+        
+                                                   
+        
+            <input type="password" id="registerPassword" placeholder="Senha" required>
+        
+            <button id="register" >Cadastrar</button>
+            <p id="registerMessage" style="color: green;"></p> <!-- Parágrafo para mensagem de sucesso -->
+        </div>
+        </div>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
                 
-                // Exemplo: Criar um documento no Firestore para o novo usuário
-                await setDoc(doc(db, "users", user.uid), {
-                    email: user.email,
-                    createdAt: new Date()
-                });
+                <div class="overlay-panel overlay-right">
+            <h1>Entrar</h1>
 
-                // Mensagem de sucesso
-                registerMessage.textContent = 'Usuário cadastrado com sucesso!';
-                
-                // Redirecionar para o perfil (ou onde preferir)
-                setTimeout(() => {
-                    window.location.href = "./perfil.html"; 
-                }, 2000); // Redireciona após 2 segundos
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            
+            <input type="password" id="loginPassword" placeholder="Senha" required>
+            <button id="login">entrar</button>
+            <p id="loginMessage" style="color: red;"></p> <!-- Parágrafo para mensagem de erro -->
+        </div>
+        </div>
+        </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+            import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+            import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    
+            // Configuração do Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyC-lYo7qq6i0NkoQYgeVbwKyqPgWfJZo5w",
+                authDomain: "redesocial-ba56d.firebaseapp.com",
+                projectId: "redesocial-ba56d",
+                storageBucket: "redesocial-ba56d.appspot.com",
+                messagingSenderId: "576775892671",
+                appId: "1:576775892671:web:4d0c2ceb8f8fca6ddf600a",
+                measurementId: "G-4558TRLJB8"
+            };
+    
+            // Inicializando o Firebase
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth();
+            const db = getFirestore();
+    
+            // Verifica se o usuário está autenticado
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Se o usuário estiver logado, redireciona para a página de perfil
+                    window.location.href = "./perfil.html";
+                }
+            });
+    
+            // Função para registrar um novo usuário
+            document.getElementById('register').addEventListener('click', async () => {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const registerMessage = document.getElementById('registerMessage'); // Mensagem de sucesso
+    
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // O usuário é criado com sucesso, então você pode adicionar mais dados ao Firestore
+                    const user = userCredential.user;
+                    
+                    // Exemplo: Criar um documento no Firestore para o novo usuário
+                    await setDoc(doc(db, "users", user.uid), {
+                        email: user.email,
+                        createdAt: new Date()
+                    });
+    
+                    // Mensagem de sucesso
+                    registerMessage.textContent = 'Usuário cadastrado com sucesso!';
+                    
+                    // Redirecionar para o perfil (ou onde preferir)
+                    setTimeout(() => {
+                        window.location.href = "./perfil.html"; 
+                    }, 2000); // Redireciona após 2 segundos
+    
+                } catch (error) {
+                    console.error('Erro ao cadastrar:', error);
+                    registerMessage.style.color = 'red';  // Altera a cor para vermelho em caso de erro
+                    registerMessage.textContent = 'Erro ao cadastrar. Verifique se o email já está em uso ou se a senha é válida.';
+                }
+            });
+    
+            // Função para fazer login
+            document.getElementById('login').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const loginMessage = document.getElementById('loginMessage'); // Mensagem de erro
+    
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    // Login bem-sucedido, redirecionar para o perfil
+                    window.location.href = "./perfil.html";
+                } catch (error) {
+                    console.error('Erro ao fazer login:', error);
+                    loginMessage.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
+                }
+            });
+        </script>
+                    
+                    
+                </div>
+            </div>
+        </div>
 
-            } catch (error) {
-                console.error('Erro ao cadastrar:', error);
-                registerMessage.style.color = 'red';  // Altera a cor para vermelho em caso de erro
-                registerMessage.textContent = 'Erro ao cadastrar. Verifique se o email já está em uso ou se a senha é válida.';
-            }
-        });
+        <div id="contato" class="page">
+            <h2>Contato</h2>
+            <p>Entre em contato conosco para mais informações.</p>
+        </div>
+    </div>
 
-        // Função para fazer login
-        document.getElementById('login').addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const loginMessage = document.getElementById('loginMessage'); // Mensagem de erro
-
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                // Login bem-sucedido, redirecionar para o perfil
-                window.location.href = "./perfil.html";
-            } catch (error) {
-                console.error('Erro ao fazer login:', error);
-                loginMessage.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
-            }
-        });
-    </script>
+    <script src="./index.js"></script>
 </body>
 </html>
